@@ -1,53 +1,37 @@
 class Solution {
-    
-    private void solveGraph(List<List<Integer>> adj, boolean[] vis, int k){
-        vis[k]=true;
-        
-        Stack<Integer> stck = new Stack<>();
-        stck.push(k);
-        while(!stck.isEmpty()){
-            int top = stck.pop();
-            
-            for(int ad:adj.get(top)){
-                if(!vis[ad]){
-                    vis[ad]=true;
-                    stck.push(ad);
-                }
-            }
+    public void dfs(ArrayList<ArrayList<Integer>> adj,HashSet<Integer> hs,int i){
+        if(hs.contains(i))return ;
+        hs.add(i);
+        for(int node : adj.get(i)){
+            dfs(adj,hs,node);
         }
     }
-    
     public List<Integer> remainingMethods(int n, int k, int[][] invocations) {
-        List<List<Integer>> adj = new ArrayList<>(n);
-        for(int i=0; i<n; i++){
+        List<Integer> ls= new ArrayList<>();
+        // Build a graph - directed
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++){
             adj.add(new ArrayList<>());
         }
-        for(int[] invocation:invocations){
-            adj.get(invocation[0]).add(invocation[1]);
+        for(int [] edge : invocations){
+            int a = edge[0];
+            int b= edge[1];
+            adj.get(a).add(b);
         }
-        
-        boolean[] vis = new boolean[n];
-        solveGraph(adj, vis, k);
-        for(int i=0; i<n; i++){
-            if(!vis[i]){
-                for(int ad:adj.get(i)){
-                    if(vis[ad]){
-                        List<Integer> list = new ArrayList<>();
-                        for(int i1=0; i1<n; i1++){
-                            list.add(i1);
-                        }
-                        return list;
-                    }
-                }
+        HashSet<Integer> hs = new HashSet<>();
+        dfs(adj,hs,k);
+        boolean remove=true;
+        for(int []edges : invocations){
+            if(!hs.contains(edges[0]) && hs.contains(edges[1])){
+                remove=false;
+                break;
             }
         }
-        
-        List<Integer> list = new ArrayList<>();
-        for(int i=0; i<n; i++){
-            if(!vis[i]){
-                list.add(i);
+        for(int i=0;i<n;i++){
+            if(!hs.contains(i)||!remove){
+                ls.add(i);
             }
         }
-        return list;
+        return ls;        
     }
 }
